@@ -11,7 +11,7 @@ walkUp = [pygame.image.load('uu.png'), pygame.image.load('uu.png'), pygame.image
 walkDown = [pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png')]
 bg = pygame.image.load('bg.jpg')
 bg = pygame.image.load('bg.jpg')
-char = pygame.image.load('standing.png')
+
 
 clock = pygame.time.Clock()
 
