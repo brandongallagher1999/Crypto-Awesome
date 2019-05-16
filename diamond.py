@@ -1,4 +1,5 @@
 import pygame
+import math
 pygame.init()
 
 windowy=1080
@@ -25,6 +26,7 @@ clock = pygame.time.Clock() #Frame-Rate of the game
 
 class player(object):
     def __init__(self,x,y,width,height):
+        self.ammo = 100
         self.x = x
         self.y = y
         self.width = width
@@ -32,6 +34,10 @@ class player(object):
         self.vel = 5        
         self.isJump = False
         self.left = False
+        self.leftUp = False
+        self.leftDown = False
+        self.rightDown = False
+        self.rightUp = False
         self.right = False
         self.down=False
         self.up= False
@@ -44,6 +50,93 @@ class player(object):
         else:
             return False
 
+    def move(self, direction):
+        if direction == "left":
+            self.left = True
+            self.right = False
+            self.down = False
+            self.up = False
+            self.leftDown = False
+            self.leftUp = False
+            self.rightDown = False
+            self.rightUp = False
+            self.x -= self.vel
+        if direction == "right":
+            self.left = False
+            self.right = True
+            self.down = False
+            self.up = False
+            self.leftDown = False
+            self.leftUp = False
+            self.rightDown = False
+            self.rightUp = False
+            self.x += self.vel
+        if direction == "down":
+            self.left = False
+            self.right = False
+            self.down = True
+            self.up = False
+            self.leftDown = False
+            self.leftUp = False
+            self.rightDown = False
+            self.rightUp = False
+            self.y += self.vel
+        if direction == "up":
+            self.left = False
+            self.right = False
+            self.down = False
+            self.up = True
+            self.leftDown = False
+            self.leftUp = False
+            self.rightDown = False
+            self.rightUp = False
+            self.y =- self.vel
+        if direction == "leftUp":
+            self.left = False
+            self.right = False
+            self.down = False
+            self.up = False
+            self.leftDown = False
+            self.leftUp = True
+            self.rightDown = False
+            self.rightUp = False
+            self.x -= self.vel
+            self.y -= self.vel
+        if direction == "leftDown":
+            self.left = False
+            self.right = False
+            self.down = False
+            self.up = False
+            self.leftDown = True
+            self.leftUp = False
+            self.rightDown = False
+            self.rightUp = False
+            self.x -= self.vel
+            self.y += self.vel
+        if direction == "rightUp":
+            self.left = False
+            self.right = False
+            self.down = False
+            self.up = False
+            self.leftDown = False
+            self.leftUp = False
+            self.rightDown = False
+            self.rightUp = True
+            self.x += self.vel
+            self.y -= self.vel
+        if direction == "rightDown":
+            self.left = False
+            self.right = False
+            self.down = False
+            self.up = False
+            self.leftDown = False
+            self.leftUp = False
+            self.rightDown = True
+            self.rightUp = False
+            self.x += self.vel
+            self.y += self.vel
+        
+
     def fixBounds(self): #Fixes the bounds if player goes outside of it.
         if self.x == 0:
             self.x += self.vel
@@ -53,6 +146,18 @@ class player(object):
             self.y += self.vel
         if self.y == windowy:
             self.y -= self.vel
+
+    #This function takes reference to the bullet list then does the code below.
+    def shoot(self, bulletList):
+        for bullet in bulletList:
+            if bullet.x < windowx and bullet.x > 0:
+                if self.up == True and self.left == False and self.right == False and self.down == False and self.leftUp == False and self.leftDown == False and self.rightDown == False and self.rightUp == False:
+                    #bullet.x += bullet.vel  
+                    bullet.y += bullet.vel
+                if self.down == True:
+                    bullet.y -= bullet.vel
+            else:
+                bulletList.pop(bulletList.index(bullet))
         
     
 
@@ -84,31 +189,64 @@ class player(object):
                 win.blit(walkLeft[0], (self.x, self.y))
 
 
+def calculate_new_xy(old_xy,speed,angle_in_radians):
+    new_x = old_xy[0] + (speed*math.cos(angle_in_radians))
+    new_y = old_xy[1] + (speed*math.sin(angle_in_radians))
+    return new_x, new_y
+
 #Remember that the origin is top left of screen
-class projectile(object):
-    def __init__(self,x,y,radius,color,facing):
-        self.x = x
-        self.y = y
+'''class projectile(object):
+    def __init__(self,x,y,radius,color,direction):
+        self.rect.center = (x,y)
         self.radius = radius
         self.color = color
-        self.facing = facing
-        self.vel = 10 * facing
+        self.direction = math.radians(direction)
+        self.vel = 10 * 1
 
     def draw(self,win):
-        pygame.draw.circle(win, self.color, (self.x,self.y), self.radius)
+        pygame.draw.circle(win, self.color, (self.x,self.y), self.radius)'''
+
+
+class projectile(pygame.sprite.Sprite):
+    def __init__(self,x,y,direction,speed):
+            pygame.sprite.Sprite.__init__(self)
+            self.image=pygame.Surface((16, 16))
+            self.image.fill((255,0,0))
+            self.rect=self.image.get_rect()
+            self.rect.center=(x,y)
+            self.direction=math.radians(direction)
+            self.speed=speed
+    def update(self):
+            self.rect.center=calculate_new_xy(self.rect.center,self.speed,self.direction)
+
+spr = pygame.sprite.Group()
 
 man = player(200, 410, 64,64) #main character sprite
 bullets = [] #bullet projectile list
 
-def redrawGameWindow():
-    win.blit(bg, (0,0))
-    man.draw(win)
-    for bullet in bullets:
-        bullet.draw(win)
+#spr.add(bullets)
 
+#draws all bullets
+def redrawGameWindow():
+    spr.update()
+    spr.draw(win)
+
+    man.draw(win)
     pygame.display.update()
 
 
+
+class Square(pygame.sprite.Sprite):
+    def __init__(self,x,y,direction,speed):
+            pygame.sprite.Sprite.__init__(self)
+            self.image=pygame.Surface((16, 16))
+            self.image.fill((255,0,0))
+            self.rect=self.image.get_rect()
+            self.rect.center=(x,y)
+            self.direction=math.radians(direction)
+            self.speed=speed
+    def update(self):
+            self.rect.center=calculate_new_xy(self.rect.center,self.speed,self.direction)
 
 
 run = True
@@ -118,41 +256,21 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-
+    win.blit(bg, (0,0))
     keys = pygame.key.get_pressed() #Keypress listener
 
     if keys[pygame.K_r]:
-        print("Man X: ", man.x, " Man Y: ", man.y, "inBounds: ", man.inBounds())
+        print("Man X: ", man.x, " Man Y: ", man.y, "inBounds: ", man.inBounds() , " Man Vel: ", man.vel)
 
-    if keys[pygame.K_LEFT] and man.inBounds(): #Left
-        man.x -= man.vel
-        man.left = True
-        man.right = False
-        man.down=False
-        man.up= False
-        man.standing = False
-    if keys[pygame.K_LEFT] and keys[pygame.K_UP] and man.inBounds(): #Left up      
-        man.x -= man.vel
-        man.y -= man.vel
-        man.left = True
-        man.up = True
-        man.down = False 
-        man.right = False
-    if keys[pygame.K_LEFT] and keys[pygame.K_UP] and man.inBounds(): #Left Down  
-        man.x -= man.vel
-        man.y += man.vel
-        man.left = True
-        man.up = False 
-        man.down = True
-        man.right = False
-    if keys[pygame.K_RIGHT] and man.inBounds(): #Right
-        man.x += man.vel
-        man.right = True
-        man.left = False
-        man.up=False
-        man.down=False
-        man.standing = False
-    if keys[pygame.K_RIGHT] and keys[pygame.K_UP] and man.inBounds(): #Right-Up
+    if keys[pygame.K_a] and man.inBounds(): #Left
+        man.move("left")
+    if keys[pygame.K_a] and keys[pygame.K_w] and man.inBounds(): #Left up      
+        man.move("leftUp")
+    if keys[pygame.K_a] and keys[pygame.K_w] and man.inBounds(): #Left Down  
+        man.move("leftDown")
+    if keys[pygame.K_d] and man.inBounds(): #Right
+        man.move("right")
+    if keys[pygame.K_d] and keys[pygame.K_w] and man.inBounds(): #Right-Up
         man.x += man.vel
         man.y -= man.vel
         man.right = True
@@ -160,7 +278,7 @@ while run:
         man.up=True
         man.down=False
         man.standing = False
-    if keys[pygame.K_RIGHT] and keys[pygame.K_DOWN] and man.inBounds(): #Right-Down
+    if keys[pygame.K_d] and keys[pygame.K_s] and man.inBounds(): #Right-Down
         man.x += man.vel
         man.y += man.vel
         man.right = True
@@ -168,14 +286,14 @@ while run:
         man.up=False
         man.down=True
         man.standing = False
-    if keys[pygame.K_UP] and man.inBounds(): #Up
+    if keys[pygame.K_w] and man.inBounds(): #Up
         man.y-= man.vel
         man.left = False
         man.right = False
         man.down=False
         man.up=True
         man.standing = False
-    if keys[pygame.K_DOWN] and man.inBounds(): #Down
+    if keys[pygame.K_s] and man.inBounds(): #Down
         man.y += man.vel
         man.right = False
         man.left = False
@@ -185,30 +303,43 @@ while run:
     
     man.fixBounds() #This is required for the man sprite to stay within game bounds and not break movement
 
+    #man.shoot(bullets)
+
     for bullet in bullets:
+        spr.add(bullet)
+
+
+    '''for bullet in bullets:
         if bullet.x < windowx and bullet.x > 0:
-            bullet.x += bullet.vel
+                #bullet.x += bullet.vel  
+                bullet.y += bullet.vel
         else:
-            bullets.pop(bullets.index(bullet))
+            bullets.pop(bullets.index(bullet))'''
 
     
+    mouseX, mouseY = pygame.mouse.get_pos()
+    rel_x, rel_y = mouseX - man.x, mouseY - man.y
 
-    if keys[pygame.K_SPACE]:
-        if man.left == True:
-            facing = -1
-        if man.right == True:
-            facing = 1
-        if man.up == True:
-            facing = -1
-        if man.down == True:
-            facing =1
-        bulletAmount = 1000
-        if len(bullets) < bulletAmount: #amount of bullets on screen
-            bullets.append(projectile(round(man.x + man.width //9), round(man.y + man.height/3), 6, (0,0,0), facing))
+    angle = (180 / math.pi) * -math.atan2(-1*(rel_y), rel_x)
+    #print("Mouse X: ", mouseX, " Mouse Y: ", mouseY)
 
     
+    if keys[pygame.K_SPACE]: #Shooting
+        if len(bullets) < man.ammo:
+            temp = projectile(round(man.x + man.width //9), round(man.y + man.height/3),angle, 5)
+            spr.add(temp)
+            bullets.append(temp)
+    
+    for bullet in bullets:
+        spr.add(bullet)
+    
+    '''spr.update()
+    spr.draw(win)
+
+    man.draw(win)
+    pygame.display.update()'''
 
 
-    redrawGameWindow()
+    redrawGameWindow() #updates the bullet position?
 
 pygame.quit()
