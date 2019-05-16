@@ -236,18 +236,6 @@ def redrawGameWindow():
 
 
 
-class Square(pygame.sprite.Sprite):
-    def __init__(self,x,y,direction,speed):
-            pygame.sprite.Sprite.__init__(self)
-            self.image=pygame.Surface((16, 16))
-            self.image.fill((255,0,0))
-            self.rect=self.image.get_rect()
-            self.rect.center=(x,y)
-            self.direction=math.radians(direction)
-            self.speed=speed
-    def update(self):
-            self.rect.center=calculate_new_xy(self.rect.center,self.speed,self.direction)
-
 
 run = True
 while run:
@@ -303,43 +291,30 @@ while run:
     
     man.fixBounds() #This is required for the man sprite to stay within game bounds and not break movement
 
-    #man.shoot(bullets)
-
     for bullet in bullets:
         spr.add(bullet)
 
-
-    '''for bullet in bullets:
-        if bullet.x < windowx and bullet.x > 0:
-                #bullet.x += bullet.vel  
-                bullet.y += bullet.vel
-        else:
-            bullets.pop(bullets.index(bullet))'''
-
     
-    mouseX, mouseY = pygame.mouse.get_pos()
-    rel_x, rel_y = mouseX - man.x, mouseY - man.y
+    mouseX, mouseY = pygame.mouse.get_pos() #Mouse position
+    rel_x, rel_y = mouseX - man.x, mouseY - man.y #relative position from the man sprite to our mouse.
 
-    angle = (180 / math.pi) * -math.atan2(-1*(rel_y), rel_x)
-    #print("Mouse X: ", mouseX, " Mouse Y: ", mouseY)
+    angle = (180 / math.pi) * -math.atan2(-1*(rel_y), rel_x) #calculates angle of bullet shooting
 
-    
     if keys[pygame.K_SPACE]: #Shooting
         if len(bullets) < man.ammo:
             temp = projectile(round(man.x + man.width //9), round(man.y + man.height/3),angle, 5)
             spr.add(temp)
             bullets.append(temp)
     
+
     for bullet in bullets:
-        spr.add(bullet)
-    
-    '''spr.update()
-    spr.draw(win)
-
-    man.draw(win)
-    pygame.display.update()'''
+        if bullet.rect.center[0] > windowx or bullet.rect.center[0] < 0 or bullet.rect.center[1] > windowy or bullet.rect.center[1] < 0:
+            bullets.pop(bullets.index(bullet))
+            spr.remove(bullet)
+        
 
 
-    redrawGameWindow() #updates the bullet position?
+
+    redrawGameWindow() #Draws the sprites on screen
 
 pygame.quit()
