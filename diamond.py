@@ -1,7 +1,9 @@
 import pygame
 pygame.init()
 
-win = pygame.display.set_mode((500,480))
+win = pygame.display.set_mode((1920,1080))
+windowy=1080
+windowx=1920
 
 pygame.display.set_caption("Shooter")
 
@@ -67,7 +69,7 @@ class projectile(object):
         self.radius = radius
         self.color = color
         self.facing = facing
-        self.vel = 8 * facing
+        self.vel = 10 * facing
 
     def draw(self,win):
         pygame.draw.circle(win, self.color, (self.x,self.y), self.radius)
@@ -83,19 +85,18 @@ def redrawGameWindow():
     pygame.display.update()
 
 
-#mainloop
 man = player(200, 410, 64,64)
 bullets = []
 run = True
 while run:
-    clock.tick(27)
+    clock.tick(60)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
     for bullet in bullets:
-        if bullet.x < 500 and bullet.x > 0:
+        if bullet.x < windowx and bullet.x > 0:
             bullet.x += bullet.vel
         else:
             bullets.pop(bullets.index(bullet))
@@ -113,7 +114,7 @@ while run:
             facing =1
 
         if len(bullets) < 1000:
-            bullets.append(projectile(round(man.x + man.width //2), round(man.y + man.height//2), 6, (0,0,0), facing))
+            bullets.append(projectile(round(man.x + man.width //9), round(man.y + man.height/3), 6, (0,0,0), facing))
 
     if keys[pygame.K_LEFT] and man.x > man.vel:
         man.x -= man.vel
@@ -122,7 +123,7 @@ while run:
         man.down=False
         man.up= False
         man.standing = False
-    elif keys[pygame.K_RIGHT] and man.x < 500 - man.width - man.vel:
+    elif keys[pygame.K_RIGHT] and man.x < windowx - man.width - man.vel:
         man.x += man.vel
         man.right = True
         man.left = False
@@ -136,7 +137,7 @@ while run:
             man.down=False
             man.up=True
             man.standing = False
-    elif keys[pygame.K_DOWN] and man.y < 500 - man.width - man.vel:
+    elif keys[pygame.K_DOWN] and man.y < windowy - man.width - man.vel:
             man.y += man.vel
             man.right = False
             man.left = False
