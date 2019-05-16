@@ -210,7 +210,7 @@ def calculate_new_xy(old_xy,speed,angle_in_radians):
 class projectile(pygame.sprite.Sprite):
     def __init__(self,x,y,direction,speed):
             pygame.sprite.Sprite.__init__(self)
-            self.image=pygame.Surface((16, 16))
+            self.image=pygame.Surface((5,5))
             self.image.fill((255,0,0))
             self.rect=self.image.get_rect()
             self.rect.center=(x,y)
@@ -302,7 +302,7 @@ while run:
 
     if keys[pygame.K_SPACE]: #Shooting
         if len(bullets) < man.ammo:
-            temp = projectile(round(man.x + man.width //9), round(man.y + man.height/3),angle, 5)
+            temp = projectile(round(man.x + man.width //9), round(man.y + man.height/3),angle, 7)
             spr.add(temp)
             bullets.append(temp)
     
