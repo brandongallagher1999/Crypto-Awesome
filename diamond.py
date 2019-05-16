@@ -5,7 +5,7 @@ pygame.init()
 windowy=1080
 windowx=1920
 
-win = pygame.display.set_mode((windowx, windowy)) #Window for game 
+win = pygame.display.set_mode((windowx, windowy)) #Window for game
 
 
 pygame.display.set_caption("Shooter") #Title of the window
@@ -17,8 +17,8 @@ walkUp = [pygame.image.load('uu.png'), pygame.image.load('uu.png'), pygame.image
 walkDown = [pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png'), pygame.image.load('dd.png')]
 
 #Background pictures
-bg = pygame.image.load('bg.jpg')
-bg = pygame.image.load('bg.jpg')
+bg = pygame.image.load('bg.png')
+bg = pygame.image.load('bg.png')
 
 
 clock = pygame.time.Clock() #Frame-Rate of the game
@@ -31,7 +31,7 @@ class player(object):
         self.y = y
         self.width = width
         self.height = height
-        self.vel = 5        
+        self.vel = 5
         self.isJump = False
         self.left = False
         self.leftUp = False
@@ -43,7 +43,7 @@ class player(object):
         self.up= False
         self.walkCount = 0
         self.standing = True
-    
+
     def inBounds(self): #Returns if the player is on in the bounds of the window
         if self.x > 0 and self.x < windowx and self.y > 0 and self.y < windowy:
             return True
@@ -135,7 +135,7 @@ class player(object):
             self.rightUp = False
             self.x += self.vel
             self.y += self.vel
-        
+
 
     def fixBounds(self): #Fixes the bounds if player goes outside of it.
         if self.x == 0:
@@ -152,14 +152,14 @@ class player(object):
         for bullet in bulletList:
             if bullet.x < windowx and bullet.x > 0:
                 if self.up == True and self.left == False and self.right == False and self.down == False and self.leftUp == False and self.leftDown == False and self.rightDown == False and self.rightUp == False:
-                    #bullet.x += bullet.vel  
+                    #bullet.x += bullet.vel
                     bullet.y += bullet.vel
                 if self.down == True:
                     bullet.y -= bullet.vel
             else:
                 bulletList.pop(bulletList.index(bullet))
-        
-    
+
+
 
     def draw(self, win):
         if self.walkCount + 1 >= 27:
@@ -221,7 +221,7 @@ class projectile(pygame.sprite.Sprite):
 
 spr = pygame.sprite.Group()
 
-man = player(200, 410, 64,64) #main character sprite
+man = player(200, 410, 40,80) #main character sprite
 bullets = [] #bullet projectile list
 
 #spr.add(bullets)
@@ -239,7 +239,7 @@ def redrawGameWindow():
 
 run = True
 while run:
-    clock.tick(60)
+    clock.tick(144)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -252,9 +252,9 @@ while run:
 
     if keys[pygame.K_a] and man.inBounds(): #Left
         man.move("left")
-    if keys[pygame.K_a] and keys[pygame.K_w] and man.inBounds(): #Left up      
+    if keys[pygame.K_a] and keys[pygame.K_w] and man.inBounds(): #Left up
         man.move("leftUp")
-    if keys[pygame.K_a] and keys[pygame.K_w] and man.inBounds(): #Left Down  
+    if keys[pygame.K_a] and keys[pygame.K_s] and man.inBounds(): #Left Down
         man.move("leftDown")
     if keys[pygame.K_d] and man.inBounds(): #Right
         man.move("right")
@@ -288,13 +288,13 @@ while run:
         man.down=True
         man.up=False
         man.standing = False
-    
+
     man.fixBounds() #This is required for the man sprite to stay within game bounds and not break movement
 
     for bullet in bullets:
         spr.add(bullet)
 
-    
+
     mouseX, mouseY = pygame.mouse.get_pos() #Mouse position
     rel_x, rel_y = mouseX - man.x, mouseY - man.y #relative position from the man sprite to our mouse.
 
@@ -302,16 +302,16 @@ while run:
 
     if keys[pygame.K_SPACE]: #Shooting
         if len(bullets) < man.ammo:
-            temp = projectile(round(man.x + man.width //9), round(man.y + man.height/3),angle, 7)
+            temp = projectile(round(man.x + man.width //9), round(man.y + man.height/3),angle, 50)
             spr.add(temp)
             bullets.append(temp)
-    
+
 
     for bullet in bullets:
         if bullet.rect.center[0] > windowx or bullet.rect.center[0] < 0 or bullet.rect.center[1] > windowy or bullet.rect.center[1] < 0:
             bullets.pop(bullets.index(bullet))
             spr.remove(bullet)
-        
+
 
 
 
