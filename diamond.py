@@ -1,8 +1,9 @@
 import pygame
 import math
-pygame.init()
 
-windowy=1080
+pygame.init() #initialize pygame library
+
+windowy=1000
 windowx=1920
 
 win = pygame.display.set_mode((windowx, windowy)) #Window for game
@@ -302,12 +303,12 @@ while run:
 
     if keys[pygame.K_SPACE]: #Shooting
         if len(bullets) < man.ammo:
-            temp = projectile(round(man.x + man.width //9), round(man.y + man.height/3),angle, 50)
+            temp = projectile(round(man.x + man.width //9), round(man.y + man.height/3),angle, 20)
             spr.add(temp)
             bullets.append(temp)
 
 
-    for bullet in bullets:
+    for bullet in bullets: #Checking to see if the bullet is out of bounds
         if bullet.rect.center[0] > windowx or bullet.rect.center[0] < 0 or bullet.rect.center[1] > windowy or bullet.rect.center[1] < 0:
             bullets.pop(bullets.index(bullet))
             spr.remove(bullet)
